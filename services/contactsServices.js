@@ -53,13 +53,13 @@ async function removeContact(contactId) {
   return removedContact;
 }
 
-async function addContact(name, email, phone) {
+async function addContact({ name, email, phone }) {
   const contacts = await readFile();
 
   const newContact = {
     id: crypto.randomUUID(),
     name: name,
-    emai: email,
+    email: email,
     phone: phone,
   };
 
@@ -70,4 +70,32 @@ async function addContact(name, email, phone) {
   return newContact;
 }
 
-export { listContacts, getContactById, removeContact, addContact };
+async function updateContact(id, contact) {
+  const contacts = await readFile();
+
+  const index = contacts.findIndex((contact) => contact.id === id);
+
+  if (index === -1) {
+    return null;
+  }
+
+  const updatedContacts = { ...contacts[index], ...contact };
+
+  const newContacts = [
+    ...contacts.slice(0, index),
+    updatedContacts,
+    ...contacts.slice(index + 1),
+  ];
+
+  await writeFile(newContacts);
+
+  return updatedContacts;
+}
+
+export default {
+  listContacts,
+  getContactById,
+  removeContact,
+  addContact,
+  updateContact,
+};
