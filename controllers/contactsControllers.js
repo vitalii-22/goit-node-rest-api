@@ -58,9 +58,9 @@ export const createContact = (req, res) => {
   });
 
   if (typeof error !== "undefined") {
-    return res
-      .status(400)
-      .send(error.details.map((error) => error.message).join(", "));
+    return res.status(400).json({
+      message: error.details.map((error) => error.message).join(", "),
+    });
   }
 
   contactsServices
@@ -94,9 +94,9 @@ export const updateContact = (req, res) => {
   });
 
   if (typeof error !== "undefined") {
-    return res
-      .status(400)
-      .send(error.details.map((error) => error.message).join(", "));
+    return res.status(400).json({
+      message: error.details.map((error) => error.message).join(", "),
+    });
   }
 
   contactsServices
