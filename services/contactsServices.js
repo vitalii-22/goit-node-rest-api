@@ -1,31 +1,29 @@
-import * as fs from "node:fs/promises";
-import path from "node:path";
+// import * as fs from "node:fs/promises";
+// import path from "node:path";
+import Contact from "../models/contact.js";
 import crypto from "node:crypto";
 
-const contactsPath = path.resolve("db", "contacts.json");
+// const contactsPath = path.resolve("db", "contacts.json");
 
-async function readFile() {
-  const data = await fs.readFile(contactsPath, { encoding: "utf-8" });
+// async function readFile() {
+//   const data = await fs.readFile(contactsPath, { encoding: "utf-8" });
 
-  return JSON.parse(data);
-}
+//   return JSON.parse(data);
+// }
 
-async function writeFile(contacts) {
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, undefined, 2));
-}
+// async function writeFile(contacts) {
+//   await fs.writeFile(contactsPath, JSON.stringify(contacts, undefined, 2));
+// }
 
 async function listContacts() {
-  const contacts = await readFile();
-
+  const contacts = await Contact.find();
   return contacts;
 }
 
 async function getContactById(contactId) {
-  const contacts = await readFile();
+  const contact = await Contact.findById(contactId);
 
-  const contact = contacts.find((contact) => contact.id === contactId);
-
-  if (typeof contact === "undefined") {
+  if (contact === null) {
     return null;
   }
 
@@ -33,29 +31,14 @@ async function getContactById(contactId) {
 }
 
 async function removeContact(contactId) {
-  const contacts = await readFile();
+  const result = await Contact.findByIdAndDelete(contactId);
 
-  const index = contacts.findIndex((contact) => contact.id === contactId);
-
-  if (index === -1) {
+  if (result === null) {
     return null;
   }
-
-  const removedContact = contacts[index];
-
-  const newContact = [
-    ...contacts.slice(0, index),
-    ...contacts.slice(index + 1),
-  ];
-
-  await writeFile(newContact);
-
-  return removedContact;
 }
 
 async function addContact({ name, email, phone }) {
-  const contacts = await readFile();
-
   const newContact = {
     id: crypto.randomUUID(),
     name: name,
@@ -63,33 +46,51 @@ async function addContact({ name, email, phone }) {
     phone: phone,
   };
 
-  contacts.push(newContact);
+  try {
+    const result = await Contact.create(newContact);
 
-  await writeFile(contacts);
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
 
   return newContact;
 }
 
 async function updateContact(id, contact) {
-  const contacts = await readFile();
+  try {
+    const newContact = {
+      name: contact.name,
+      email: contact.email,
+      phone: contact.phone,
+    };
 
-  const index = contacts.findIndex((contact) => contact.id === id);
+    const result = await Book.findByIdAndUpdate(id, newContact);
 
-  if (index === -1) {
-    return null;
+    if (result === null) {
+      return null;
+    }
+  } catch (error) {
+    console.log(error);
   }
 
-  const updatedContacts = { ...contacts[index], ...contact };
+  // const index = contacts.findIndex((contact) => contact.id === id);
 
-  const newContacts = [
-    ...contacts.slice(0, index),
-    updatedContacts,
-    ...contacts.slice(index + 1),
-  ];
+  // if (index === -1) {
+  //   return null;
+  // }
 
-  await writeFile(newContacts);
+  // const updatedContacts = { ...contacts[index], ...contact };
 
-  return updatedContacts;
+  // const newContacts = [
+  //   ...contacts.slice(0, index),
+  //   updatedContacts,
+  //   ...contacts.slice(index + 1),
+  // ];
+
+  // await writeFile(newContacts);
+
+  // return updatedContacts;
 }
 
 export default {
