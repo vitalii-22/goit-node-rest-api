@@ -9,8 +9,7 @@ export const getAllContacts = (req, res) => {
   contactsServices
     .listContacts()
     .then((contacts) => {
-      // return res.status(200).json(contacts);
-      res.send(contacts);
+      return res.status(200).json(contacts);
     })
     .catch((error) => {
       console.error(error);

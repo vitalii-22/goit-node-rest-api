@@ -23,9 +23,9 @@ async function listContacts() {
 async function getContactById(contactId) {
   const contact = await Contact.findById(contactId);
 
-  if (contact === null) {
-    return null;
-  }
+  // if (contact === null) {
+  //   return null;
+  // }
 
   return contact;
 }
@@ -33,9 +33,9 @@ async function getContactById(contactId) {
 async function removeContact(contactId) {
   const result = await Contact.findByIdAndDelete(contactId);
 
-  if (result === null) {
-    return null;
-  }
+  console.log(result);
+
+  return result;
 }
 
 async function addContact({ name, email, phone }) {
@@ -65,7 +65,9 @@ async function updateContact(id, contact) {
       phone: contact.phone,
     };
 
-    const result = await Book.findByIdAndUpdate(id, newContact);
+    const result = await Contact.update({ _id: id }, newContact, {
+      upsert: false,
+    });
 
     if (result === null) {
       return null;
