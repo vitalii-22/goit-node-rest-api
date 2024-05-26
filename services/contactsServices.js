@@ -1,19 +1,5 @@
-// import * as fs from "node:fs/promises";
-// import path from "node:path";
 import Contact from "../models/contact.js";
 import crypto from "node:crypto";
-
-// const contactsPath = path.resolve("db", "contacts.json");
-
-// async function readFile() {
-//   const data = await fs.readFile(contactsPath, { encoding: "utf-8" });
-
-//   return JSON.parse(data);
-// }
-
-// async function writeFile(contacts) {
-//   await fs.writeFile(contactsPath, JSON.stringify(contacts, undefined, 2));
-// }
 
 async function listContacts() {
   const contacts = await Contact.find();
@@ -22,10 +8,6 @@ async function listContacts() {
 
 async function getContactById(contactId) {
   const contact = await Contact.findById(contactId);
-
-  // if (contact === null) {
-  //   return null;
-  // }
 
   return contact;
 }
@@ -65,28 +47,29 @@ async function updateContact(contactId, contact) {
       phone: contact.phone,
     };
 
-    const result = await Contact.findOneAndUpdate(contactId, newContact);
+    const result = await Contact.findByIdAndUpdate(contactId, newContact);
+    return result;
   } catch (error) {
     console.log(error);
   }
+}
 
-  // const index = contacts.findIndex((contact) => contact.id === id);
+async function updateStatusContact(contactId, contact) {
+  try {
+    console.log(contactId);
+    console.log(contact);
+    const newContact = {
+      favorite: contact.favorite,
+    };
 
-  // if (index === -1) {
-  //   return null;
-  // }
+    const result = await Contact.findByIdAndUpdate(contactId, newContact, {
+      new: true,
+    });
 
-  // const updatedContacts = { ...contacts[index], ...contact };
-
-  // const newContacts = [
-  //   ...contacts.slice(0, index),
-  //   updatedContacts,
-  //   ...contacts.slice(index + 1),
-  // ];
-
-  // await writeFile(newContacts);
-
-  // return updatedContacts;
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 export default {
@@ -95,4 +78,5 @@ export default {
   removeContact,
   addContact,
   updateContact,
+  updateStatusContact,
 };

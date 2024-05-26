@@ -3,6 +3,7 @@ import contactsServices from "../services/contactsServices.js";
 import {
   createContactSchema,
   updateContactSchema,
+  updateStatusContactSchema,
 } from "../schemas/contactsSchemas.js";
 
 export const getAllContacts = (req, res) => {
@@ -105,16 +106,50 @@ export const updateContact = (req, res) => {
     .updateContact(id, data)
     .then((contact) => {
       if (contact === null) {
-        return res
-          .status(400)
-          .json({ message: "Body must have at least one field" });
+        return res.status(404).json({ message: "Not found" });
       }
 
       res.status(200).json({
-        id: contact.id,
-        name: contact.name,
-        email: contact.email,
-        phone: contact.phone,
+        contact,
+      });
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
+export const updateStatusContact = (req, res) => {
+  const { id } = req.params;
+
+  const data = req.body;
+
+  if (Object.keys(data).length === 0) {
+    return res.status(400).json({ message: "body must have a favorite field" });
+  }
+
+  const { error, value } = updateStatusContactSchema.validate(data, {
+    abortEarly: false,
+  });
+
+  if (typeof error !== "undefined") {
+    return res.status(400).json({
+      message: error.details.map((error) => error.message).join(", "),
+    });
+  }
+
+  const newContact = {
+    favorite: req.body.favorite,
+  };
+
+  contactsServices
+    .updateStatusContact(id, newContact)
+    .then((contact) => {
+      if (contact === null) {
+        return res.status(404).json({ message: "Not found" });
+      }
+
+      res.status(200).json({
+        contact,
       });
     })
     .catch((error) => {
