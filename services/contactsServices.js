@@ -57,7 +57,7 @@ async function addContact({ name, email, phone }) {
   return newContact;
 }
 
-async function updateContact(id, contact) {
+async function updateContact(contactId, contact) {
   try {
     const newContact = {
       name: contact.name,
@@ -65,13 +65,7 @@ async function updateContact(id, contact) {
       phone: contact.phone,
     };
 
-    const result = await Contact.update({ _id: id }, newContact, {
-      upsert: false,
-    });
-
-    if (result === null) {
-      return null;
-    }
+    const result = await Contact.findOneAndUpdate(contactId, newContact);
   } catch (error) {
     console.log(error);
   }
