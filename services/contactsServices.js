@@ -20,12 +20,13 @@ async function removeContact(contactId) {
   return result;
 }
 
-async function addContact({ name, email, phone }) {
+async function addContact({ name, email, phone, favorite }) {
   const newContact = {
     id: crypto.randomUUID(),
     name: name,
     email: email,
     phone: phone,
+    favorite: favorite,
   };
 
   try {
@@ -35,8 +36,6 @@ async function addContact({ name, email, phone }) {
   } catch (error) {
     console.log(error);
   }
-
-  return newContact;
 }
 
 async function updateContact(contactId, contact) {
@@ -45,9 +44,12 @@ async function updateContact(contactId, contact) {
       name: contact.name,
       email: contact.email,
       phone: contact.phone,
+      favorite: contact.favorite,
     };
 
-    const result = await Contact.findByIdAndUpdate(contactId, newContact);
+    const result = await Contact.findByIdAndUpdate(contactId, newContact, {
+      new: true,
+    });
     return result;
   } catch (error) {
     console.log(error);

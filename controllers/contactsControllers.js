@@ -6,6 +6,8 @@ import {
   updateStatusContactSchema,
 } from "../schemas/contactsSchemas.js";
 
+import { isValidObjectId } from "mongoose";
+
 export const getAllContacts = (req, res) => {
   contactsServices
     .listContacts()
@@ -19,6 +21,10 @@ export const getAllContacts = (req, res) => {
 
 export const getOneContact = (req, res) => {
   const { id } = req.params;
+
+  if (!isValidObjectId(id)) {
+    return res.status(404).json({ message: "Not found" });
+  }
 
   contactsServices
     .getContactById(id)
@@ -35,6 +41,10 @@ export const getOneContact = (req, res) => {
 
 export const deleteContact = (req, res) => {
   const { id } = req.params;
+
+  if (!isValidObjectId(id)) {
+    return res.status(404).json({ message: "Not found" });
+  }
 
   contactsServices
     .removeContact(id)
@@ -54,6 +64,7 @@ export const createContact = (req, res) => {
     name: req.body.name,
     email: req.body.email,
     phone: req.body.phone,
+    favorite: req.body.favorite,
   };
 
   const { error, value } = createContactSchema.validate(contact, {
@@ -70,10 +81,11 @@ export const createContact = (req, res) => {
     .addContact(contact)
     .then((contact) => {
       res.status(201).json({
-        id: contact.id,
+        _id: contact.id,
         name: contact.name,
         email: contact.email,
         phone: contact.phone,
+        favorite: contact.favorite,
       });
     })
     .catch((error) => {
@@ -83,6 +95,10 @@ export const createContact = (req, res) => {
 
 export const updateContact = (req, res) => {
   const { id } = req.params;
+
+  if (!isValidObjectId(id)) {
+    return res.status(404).json({ message: "Not found" });
+  }
 
   const data = req.body;
 
@@ -110,7 +126,11 @@ export const updateContact = (req, res) => {
       }
 
       res.status(200).json({
-        contact,
+        _id: contact.id,
+        name: contact.name,
+        email: contact.email,
+        phone: contact.phone,
+        favorite: contact.favorite,
       });
     })
     .catch((error) => {
@@ -120,6 +140,10 @@ export const updateContact = (req, res) => {
 
 export const updateStatusContact = (req, res) => {
   const { id } = req.params;
+
+  if (!isValidObjectId(id)) {
+    return res.status(404).json({ message: "Not found" });
+  }
 
   const data = req.body;
 
@@ -149,7 +173,11 @@ export const updateStatusContact = (req, res) => {
       }
 
       res.status(200).json({
-        contact,
+        _id: contact.id,
+        name: contact.name,
+        email: contact.email,
+        phone: contact.phone,
+        favorite: contact.favorite,
       });
     })
     .catch((error) => {
